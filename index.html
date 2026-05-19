@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <title>COM7 PING PONG LEAGUE 2026</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #060d18;
+      font-family: 'Anuphan', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      text-align: center;
+      padding: 16px 20px 8px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+    }
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.5rem, 3.2vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: 6px;
+      background: linear-gradient(90deg, #00c853, #69ff47, #00c853);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 16px rgba(0,200,80,0.7));
+    }
+    .header .subtitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(0.55rem, 0.9vw, 0.8rem);
+      color: #444;
+      letter-spacing: 8px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ─── SCOREBOARD ─── */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr 150px 1fr;
+      min-height: 0;
+    }
+
+    /* ─── PLAYER PANEL ─── */
+    .player-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 24px 20px;
+      position: relative;
+      gap: 8px;
+    }
+    .p1 { background: linear-gradient(135deg, rgba(255,80,0,0.16) 0%, rgba(255,80,0,0.03) 100%); }
+    .p2 { background: linear-gradient(225deg, rgba(0,120,255,0.16) 0%, rgba(0,120,255,0.03) 100%); }
+
+    .serving-badge {
+      position: absolute;
+      top: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(0.9rem, 1.4vw, 1.3rem);
+      letter-spacing: 4px;
+      color: #ffcc00;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-shadow: 0 0 12px rgba(255,204,0,0.7);
+    }
+    .player-panel.serving .serving-badge { opacity: 1; }
+
+    /* ตัด .player-label ออก — ใช้ชื่อเดียวไม่สับสน */
+    .player-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.1rem, 2.5vw, 2rem);
+      font-weight: 700;
+      cursor: pointer;
+      border-bottom: 2px dashed rgba(255,255,255,0.15);
+      padding-bottom: 4px;
+      text-align: center;
+      transition: opacity 0.2s;
+      line-height: 1.2;
+    }
+    .p1 .player-name { color: #ff8c42; }
+    .p2 .player-name { color: #42a8ff; }
+    .player-name:hover { opacity: 0.6; }
+    .name-hint {
+      font-family: 'Anuphan', sans-serif;
+      font-size: 0.7rem; color: rgba(255,255,255,0.38); letter-spacing: 1px;
+      margin-top: -4px;
+    }
+
+    /* ─── SCORE ─── */
+    .score-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+      letter-spacing: 4px; color: #3a3a3a;
+      text-transform: uppercase;
+    }
+    .score-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(5.5rem, 16vw, 13rem);
+      font-weight: 900;
+      line-height: 0.9;
+      transition: transform 0.12s;
+    }
+    .p1 .score-value { color: #ff8c42; text-shadow: 0 0 60px rgba(255,140,66,0.4); }
+    .p2 .score-value { color: #42a8ff; text-shadow: 0 0 60px rgba(66,168,255,0.4); }
+    .score-value.bump { transform: scale(1.16); }
+
+    /* ─── ปุ่ม + / - ขนาดเท่ากัน ─── */
+    .score-btns { display: flex; gap: 10px; justify-content: center; width: 100%; }
+    .btn-score {
+      flex: 1;
+      max-width: 140px;
+      padding: clamp(8px,1.1vh,13px) 0;
+      border: none; border-radius: 10px;
+      font-family: 'Anuphan', sans-serif;
+      font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+      font-weight: 700;
+      cursor: pointer; transition: transform 0.1s, opacity 0.15s;
+      text-align: center;
+    }
+    .btn-score:active { transform: scale(0.92); }
+    .btn-minus {
+      background: rgba(255,255,255,0.09);
+      color: #ccc;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .btn-minus:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .p1 .btn-plus { background: #ff6b00; color: #fff; }
+    .p1 .btn-plus:hover { background: #ff8c42; }
+    .p2 .btn-plus { background: #0078ff; color: #fff; }
+    .p2 .btn-plus:hover { background: #42a8ff; }
+
+    /* ─── CENTER COLUMN ─── */
+    .center-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.28);
+      border-left:  1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .vs-badge {
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem; font-weight: 700; color: #444;
+    }
+    .center-sets-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.58rem; letter-spacing: 3px; color: #3a3a3a;
+    }
+    .center-sets-score { display: flex; align-items: center; gap: 6px; }
+    .center-sets-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 900; line-height: 1;
+    }
+    .center-sets-num.p1c { color: #ff8c42; text-shadow: 0 0 18px rgba(255,140,66,0.35); }
+    .center-sets-num.p2c { color: #42a8ff; text-shadow: 0 0 18px rgba(66,168,255,0.35); }
+    .center-sets-sep { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #2a2a2a; font-weight: 700; }
+    .set-num-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.52rem; letter-spacing: 2px; color: #303030;
+    }
+    .deuce-indicator {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.62rem; font-weight: 900; letter-spacing: 3px;
+      color: #ff4444;
+      background: rgba(255,68,68,0.1);
+      border: 1px solid rgba(255,68,68,0.35);
+      border-radius: 20px; padding: 3px 12px;
+      animation: pulse-red 0.8s infinite alternate;
+    }
+    @keyframes pulse-red {
+      from { box-shadow: 0 0 4px rgba(255,68,68,0.2); }
+      to   { box-shadow: 0 0 14px rgba(255,68,68,0.65); }
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      background: rgba(0,0,0,0.5);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ─── ปุ่ม controls ขนาดเท่ากัน ─── */
+    .controls {
+      display: flex; gap: 10px;
+      justify-content: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .btn-ctrl {
+      flex: 1;
+      max-width: 220px;
+      padding: clamp(8px,1vh,12px) 10px;
+      border: none; border-radius: 10px;
+      font-family: 'Anuphan', sans-serif;
+      font-size: clamp(0.8rem, 1vw, 0.95rem);
+      font-weight: 700;
+      cursor: pointer; transition: transform 0.1s, opacity 0.15s;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .btn-ctrl:active { transform: scale(0.94); }
+    .btn-save-set {
+      background: linear-gradient(135deg, #1a9e3f, #17b978);
+      color: #fff;
+    }
+    .btn-save-set:hover { opacity: 0.85; }
+    .btn-swap {
+      background: #3a3a3a;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+    }
+    .btn-swap:hover { background: #4a4a4a; }
+    .btn-reset-score {
+      background: #7a6000;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+    }
+    .btn-reset-score:hover { background: #9a7a00; }
+    .btn-reset-all {
+      background: #6b1a22;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+    }
+    .btn-reset-all:hover { background: #8b2230; }
+
+    /* ─── HISTORY ─── */
+    .history-section { padding: 8px 30px 12px; overflow-y: auto; max-height: 26vh; }
+    .history-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem; letter-spacing: 4px; color: #303030;
+      text-align: center; margin-bottom: 6px;
+    }
+    .history-table { width: 100%; border-collapse: collapse; font-size: clamp(0.78rem, 0.95vw, 0.92rem); }
+    .history-table th {
+      background: rgba(255,255,255,0.04); color: #505050; font-weight: 600;
+      padding: 5px 12px; text-align: center; font-size: 0.7rem; letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Anuphan', sans-serif;
+    }
+    .history-table td {
+      padding: 5px 12px; text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04); color: #aaa;
+      font-family: 'Anuphan', sans-serif;
+    }
+    .winner-cell { color: #ffcc00; font-weight: 700; }
+    .history-empty { text-align: center; color: #2e2e2e; font-size: 0.82rem; padding: 8px; font-family: 'Anuphan', sans-serif; }
+
+    /* ─── WIN OVERLAY ─── */
+    .win-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92); z-index: 200;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 24px;
+    }
+    .win-overlay.show { display: flex; }
+    .win-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 7vw, 5rem); font-weight: 900;
+      color: #ffcc00; text-align: center;
+      animation: pulse-gold 1s infinite alternate;
+    }
+    .win-sub { color: #666; font-size: clamp(0.9rem, 1.4vw, 1.15rem); text-align: center; font-family: 'Anuphan', sans-serif; }
+    .btn-close-overlay {
+      padding: 14px 44px;
+      background: linear-gradient(135deg, #ff6b00, #ffcc00);
+      color: #000; border: none; border-radius: 14px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+      font-weight: 700; cursor: pointer; letter-spacing: 3px;
+    }
+    .btn-close-overlay:hover { opacity: 0.85; }
+    @keyframes pulse-gold {
+      from { filter: drop-shadow(0 0 12px #ffcc00); }
+      to   { filter: drop-shadow(0 0 40px #ffcc00) brightness(1.3); }
+    }
+
+    @media (max-width: 600px) {
+      html, body { overflow: auto; }
+      .app { height: auto; }
+      .scoreboard { grid-template-columns: 1fr; }
+      .center-col { flex-direction: row; padding: 14px 20px; border: none; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .controls { flex-wrap: wrap; }
+      .btn-ctrl { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="win-overlay" id="winOverlay">
+  <div class="win-text" id="winText"></div>
+  <div class="win-sub"  id="winSub"></div>
+  <button class="btn-close-overlay" onclick="closeOverlay()">CONTINUE</button>
+</div>
+
+<div class="app">
+
+  <div class="header">
+    <h1>COM7 PING PONG LEAGUE 2026</h1>
+    <div class="subtitle"> Scoreboard</div>
+  </div>
+
+  <div class="scoreboard">
+
+    <!-- PLAYER 1 (ฝั่งซ้าย) -->
+    <div class="player-panel p1" id="panel1">
+      <div class="serving-badge">🏓SERVING🏓</div>
+      <div class="player-name" id="name1" onclick="editName(1)" title="คลิกเพื่อแก้ชื่อ">PLAYER 1</div>
+      <div class="name-hint">คลิกเพื่อแก้ชื่อ</div>
+      <div class="score-label">SCORE</div>
+      <div class="score-value" id="score1">0</div>
+      <div class="score-btns">
+        <button class="btn-score btn-minus" onclick="changeScore(1,-1)">− ลด</button>
+        <button class="btn-score btn-plus"  onclick="changeScore(1,+1)">+ เพิ่ม</button>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="center-col">
+      <div class="vs-badge">VS</div>
+      <div class="center-sets-label">SETS WON</div>
+      <div class="center-sets-score">
+        <span class="center-sets-num p1c" id="sets1">0</span>
+        <span class="center-sets-sep">:</span>
+        <span class="center-sets-num p2c" id="sets2">0</span>
+      </div>
+      <div class="set-num-label">SET <span id="setNumDisplay">1</span></div>
+      <div class="deuce-indicator" id="deuceIndicator" style="display:none;">DEUCE</div>
+    </div>
+
+    <!-- PLAYER 2 (ฝั่งขวา) -->
+    <div class="player-panel p2" id="panel2">
+      <div class="serving-badge">🏓 SERVING</div>
+      <div class="player-name" id="name2" onclick="editName(2)" title="คลิกเพื่อแก้ชื่อ">PLAYER 2</div>
+      <div class="name-hint">คลิกเพื่อแก้ชื่อ</div>
+      <div class="score-label">SCORE</div>
+      <div class="score-value" id="score2">0</div>
+      <div class="score-btns">
+        <button class="btn-score btn-minus" onclick="changeScore(2,-1)">− ลด</button>
+        <button class="btn-score btn-plus"  onclick="changeScore(2,+1)">+ เพิ่ม</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="controls">
+      <button class="btn-ctrl btn-save-set"    onclick="saveSet()">บันทึกเซ็ต + สลับฝั่ง</button>
+      <button class="btn-ctrl btn-swap"        onclick="swapSides()">สลับฝั่ง</button>
+      <button class="btn-ctrl btn-reset-score" onclick="resetScore()">รีเซ็ตคะแนน</button>
+      <button class="btn-ctrl btn-reset-all"   onclick="resetAll()">รีเซ็ตทั้งหมด</button>
+    </div>
+    <div class="history-section">
+      <div class="history-title">SET HISTORY</div>
+      <div class="history-empty" id="historyEmpty">ยังไม่มีประวัติเซ็ต</div>
+      <table class="history-table" id="historyTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>SET</th>
+            <th id="hName1">PLAYER 1</th>
+            <th id="hName2">PLAYER 2</th>
+            <th>ผู้ชนะเซ็ต</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const state = {
+    score: [0,0], sets: [0,0],
+    names: ['PLAYER 1','PLAYER 2'],
+    serving: 1, firstServer: 1,
+    history: [], setCount: 0, winSets: 3
+  };
+
+  function render() {
+    document.getElementById('score1').textContent    = state.score[0];
+    document.getElementById('score2').textContent    = state.score[1];
+    document.getElementById('sets1').textContent     = state.sets[0];
+    document.getElementById('sets2').textContent     = state.sets[1];
+    document.getElementById('name1').textContent     = state.names[0];
+    document.getElementById('name2').textContent     = state.names[1];
+    document.getElementById('hName1').textContent    = state.names[0];
+    document.getElementById('hName2').textContent    = state.names[1];
+    document.getElementById('setNumDisplay').textContent = state.setCount + 1;
+    document.getElementById('panel1').classList.toggle('serving', state.serving === 1);
+    document.getElementById('panel2').classList.toggle('serving', state.serving === 2);
+  }
+
+  function changeScore(player, delta) {
+    const i = player - 1;
+    state.score[i] = Math.max(0, state.score[i] + delta);
+    const el = document.getElementById('score' + player);
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 180);
+    updateServing();
+    checkDeuce();
+    render();
+  }
+
+  /* เสิร์ฟ 2 ครั้งสลับ | Deuce (>=10-10): สลับทุก 1 แต้ม */
+  function updateServing() {
+    const [s1, s2] = state.score;
+    const total    = s1 + s2;
+    const isDeuce  = s1 >= 10 && s2 >= 10;
+    if (isDeuce) {
+      const pts = total - 20;
+      state.serving = (pts % 2 === 0)
+        ? state.firstServer
+        : (state.firstServer === 1 ? 2 : 1);
+    } else {
+      const block = Math.floor(total / 2);
+      state.serving = (block % 2 === 0)
+        ? state.firstServer
+        : (state.firstServer === 1 ? 2 : 1);
+    }
+  }
+
+  function checkDeuce() {
+    const [s1, s2] = state.score;
+    const isDeuce  = s1 >= 10 && s2 >= 10 && s1 === s2;
+    document.getElementById('deuceIndicator').style.display = isDeuce ? 'block' : 'none';
+  }
+
+  /* ชนะเซ็ต: >=11 แต้ม และนำห่าง 2 */
+  function isSetWinner(s1, s2) {
+    if (s1 >= 11 && s1 - s2 >= 2) return 0;   // player 1 ชนะ
+    if (s2 >= 11 && s2 - s1 >= 2) return 1;   // player 2 ชนะ
+    return -1;                                  // ยังไม่มีผู้ชนะ
+  }
+
+  function saveSet() {
+    const [s1, s2] = state.score;
+    if (s1 === 0 && s2 === 0) { alert('คะแนนยังเป็น 0 ทั้งคู่'); return; }
+
+    const winIdx = isSetWinner(s1, s2);
+    if (winIdx === -1) {
+      if (!confirm(
+        'คะแนน ' + s1 + '-' + s2 + ' ยังไม่ถึงเงื่อนไขชนะเซ็ต\n' +
+        '(ต้องได้อย่างน้อย 11 แต้ม และนำห่าง 2 แต้ม)\n\nบันทึกต่อไปหรือไม่?'
+      )) return;
+    }
+
+    state.setCount++;
+    const winner = winIdx >= 0 ? state.names[winIdx] : 'เสมอ';
+    if (winIdx >= 0) state.sets[winIdx]++;
+    state.history.push({ set: state.setCount, s1, s2, winner, winIdx });
+    renderHistory();
+
+    if (state.sets[0] >= state.winSets || state.sets[1] >= state.winSets)
+      showWin(state.sets[0] >= state.winSets ? state.names[0] : state.names[1]);
+
+    state.score = [0, 0];
+    const nextServer = winIdx >= 0 ? winIdx + 1 : state.serving;
+    state.firstServer = nextServer;
+    state.serving     = nextServer;
+    document.getElementById('deuceIndicator').style.display = 'none';
+    swapSides(true);
+    render();
+  }
+
+  function swapSides(silent) {
+    [state.names[0], state.names[1]] = [state.names[1], state.names[0]];
+    [state.score[0], state.score[1]] = [state.score[1], state.score[0]];
+    [state.sets[0],  state.sets[1]]  = [state.sets[1],  state.sets[0]];
+    state.serving     = state.serving     === 1 ? 2 : 1;
+    state.firstServer = state.firstServer === 1 ? 2 : 1;
+    render();
+  }
+
+  function resetScore() {
+    state.score = [0, 0];
+    updateServing();
+    checkDeuce();
+    render();
+  }
+
+  function resetAll() {
+    if (!confirm('รีเซ็ตทั้งหมด? ประวัติเซ็ตจะถูกลบด้วย')) return;
+    Object.assign(state, {
+      score:[0,0], sets:[0,0], names:['PLAYER 1','PLAYER 2'],
+      serving:1, firstServer:1, history:[], setCount:0
+    });
+    document.getElementById('deuceIndicator').style.display = 'none';
+    renderHistory();
+    render();
+  }
+
+  function editName(player) {
+    const i = player - 1;
+    const n = prompt('ชื่อผู้เล่น ' + player + ':', state.names[i]);
+    if (n && n.trim()) { state.names[i] = n.trim().toUpperCase(); render(); }
+  }
+
+  function renderHistory() {
+    const table = document.getElementById('historyTable');
+    const empty = document.getElementById('historyEmpty');
+    if (!state.history.length) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    table.style.display = 'table';
+    empty.style.display = 'none';
+    document.getElementById('historyBody').innerHTML = state.history.map(h => `
+      <tr>
+        <td>${h.set}</td>
+        <td class="${h.winIdx === 0 ? 'winner-cell' : ''}">${h.s1}</td>
+        <td class="${h.winIdx === 1 ? 'winner-cell' : ''}">${h.s2}</td>
+        <td class="winner-cell">${h.winner}</td>
+      </tr>`).join('');
+  }
+
+  function showWin(name) {
+    document.getElementById('winText').textContent = '🏆 ' + name + ' ชนะ!';
+    document.getElementById('winSub').textContent  =
+      'ชนะ ' + state.winSets + ' เซ็ต — ชนะการแข่งขัน';
+    document.getElementById('winOverlay').classList.add('show');
+  }
+
+  function closeOverlay() {
+    document.getElementById('winOverlay').classList.remove('show');
+  }
+
+  render();
+</script>
+</body>
+</html>
