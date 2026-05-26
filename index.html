@@ -66,7 +66,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px 24px 20px;
+      padding: 16px 24px 28px;
       position: relative;
       gap: 8px;
     }
@@ -117,7 +117,7 @@
     }
     .score-value {
       font-family: 'Orbitron', sans-serif;
-      font-size: clamp(5.5rem, 16vw, 13rem);
+      font-size: clamp(7rem, 20vw, 18rem);
       font-weight: 900;
       line-height: 0.9;
       transition: transform 0.12s;
@@ -127,29 +127,27 @@
     .score-value.bump { transform: scale(1.16); }
 
     /* ─── ปุ่ม + / - ขนาดเท่ากัน ─── */
-    .score-btns { display: flex; gap: 10px; justify-content: center; width: 100%; }
+    .score-btns { display: flex; gap: 16px; justify-content: center; width: 100%; margin-top: 16px; }
     .btn-score {
-      flex: 1;
-      max-width: 140px;
-      padding: clamp(8px,1.1vh,13px) 0;
-      border: none; border-radius: 10px;
-      font-family: 'Anuphan', sans-serif;
-      font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+      width: 36px; height: 36px;
+      border: none; border-radius: 50%;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
       font-weight: 700;
       cursor: pointer; transition: transform 0.1s, opacity 0.15s;
       text-align: center;
+      line-height: 1;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
     }
+    .btn-score:hover { color: #ccc; }
     .btn-score:active { transform: scale(0.92); }
-    .btn-minus {
-      background: rgba(255,255,255,0.09);
-      color: #ccc;
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-    .btn-minus:hover { background: rgba(255,255,255,0.16); color: #fff; }
-    .p1 .btn-plus { background: #ff6b00; color: #fff; }
-    .p1 .btn-plus:hover { background: #ff8c42; }
-    .p2 .btn-plus { background: #0078ff; color: #fff; }
-    .p2 .btn-plus:hover { background: #42a8ff; }
+    .btn-minus { color: rgba(255,255,255,0.25); }
+    .btn-minus:hover { color: rgba(255,255,255,0.6); }
+    .p1 .btn-plus { color: rgba(255,255,255,0.25); }
+    .p1 .btn-plus:hover { color: rgba(255,255,255,0.6); }
+    .p2 .btn-plus { color: rgba(255,255,255,0.25); }
+    .p2 .btn-plus:hover { color: rgba(255,255,255,0.6); }
 
     /* ─── CENTER COLUMN ─── */
     .center-col {
@@ -163,12 +161,14 @@
       border-right: 1px solid rgba(255,255,255,0.06);
     }
     .vs-badge {
-      width: 50px; height: 50px; border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,80,0,0.3), rgba(0,120,255,0.3));
+      border: 1px solid rgba(255,255,255,0.2);
       display: flex; align-items: center; justify-content: center;
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem; font-weight: 700; color: #444;
+      font-size: 1.1rem; font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.5);
     }
     .center-sets-label {
       font-family: 'Orbitron', sans-serif;
@@ -336,12 +336,12 @@
     <div class="player-panel p1" id="panel1">
       <div class="serving-badge">🏓SERVING🏓</div>
       <div class="player-name" id="name1" onclick="editName(1)" title="คลิกเพื่อแก้ชื่อ">PLAYER 1</div>
-      <div class="name-hint">คลิกเพื่อแก้ชื่อ</div>
+  
       <div class="score-label">SCORE</div>
       <div class="score-value" id="score1">0</div>
       <div class="score-btns">
-        <button class="btn-score btn-minus" onclick="changeScore(1,-1)">− ลด</button>
-        <button class="btn-score btn-plus"  onclick="changeScore(1,+1)">+ เพิ่ม</button>
+        <button class="btn-score btn-minus" onclick="changeScore(1,-1)">−</button>
+        <button class="btn-score btn-plus"  onclick="changeScore(1,+1)">+</button>
       </div>
     </div>
 
@@ -362,12 +362,12 @@
     <div class="player-panel p2" id="panel2">
       <div class="serving-badge">🏓 SERVING</div>
       <div class="player-name" id="name2" onclick="editName(2)" title="คลิกเพื่อแก้ชื่อ">PLAYER 2</div>
-      <div class="name-hint">คลิกเพื่อแก้ชื่อ</div>
+  
       <div class="score-label">SCORE</div>
       <div class="score-value" id="score2">0</div>
       <div class="score-btns">
-        <button class="btn-score btn-minus" onclick="changeScore(2,-1)">− ลด</button>
-        <button class="btn-score btn-plus"  onclick="changeScore(2,+1)">+ เพิ่ม</button>
+        <button class="btn-score btn-minus" onclick="changeScore(2,-1)">−</button>
+        <button class="btn-score btn-plus"  onclick="changeScore(2,+1)">+</button>
       </div>
     </div>
 
